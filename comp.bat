@@ -1,3 +1,3 @@
 nasm -f bin -o boot.bin boot.asm
-
-py hexEdit.py
+qemu-system-i386 boot.bin
+:: py hexEdit.py

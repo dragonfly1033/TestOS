@@ -1,8 +1,15 @@
+[bits 16]
 [org 0x7C00]
 
-mov bp, 0x8000
-mov sp, bp
+xor  ax, ax
+mov  ds, ax
+mov  es, ax    
+cli
+mov  ss, ax 
+mov  sp, 0x8000
+sti
 
+mov [BOOT_DRIVE], dl
 
 start:
     mov si, WELCOME_MESSAGE
@@ -14,6 +21,10 @@ start:
     mov si, DISK_MESSAGE
     call print_string16
 
+    call load_disk
+
+    mov si, PROGRAM_SPACE
+    call print_string16
 
     jmp $   
 
@@ -24,8 +35,13 @@ start:
 DISK_MESSAGE: db 'Loading Disk\',0
 WELCOME_MESSAGE: db '\Booting Test OS\',0
 _16BIT_MESSAGE: db '16 bit real mode\',0
+BOOT_DRIVE: db 0
+KERNEL_OFFSET equ 0x1000
+PROGRAM_SPACE equ 0x7E00
 
 
 times 510-($-$$) db 0
 dw 0xaa55
 
+dw 0x4241
+times 510 db 0
