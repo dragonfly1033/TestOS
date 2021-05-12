@@ -6,7 +6,7 @@ load_disk:
 
     mov dh, 1
 
-    mov dl, 0x80;[BOOT_DRIVE]    ; dl <- drive no. assigned by BIOS
+                            ; dl <- drive no. assigned by BIOS
     mov al, dh              ; no. of sectors to read after start sector cl
     mov cl, 0x02            ; start read at this sector no.
     mov ch, 0x00            ; cylinder no. 

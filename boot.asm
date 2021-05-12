@@ -1,15 +1,14 @@
 [bits 16]
 [org 0x7C00]
 
-xor  ax, ax
-mov  ds, ax
-mov  es, ax    
-cli
-mov  ss, ax 
-mov  sp, 0x8000
-sti
+xor  ax, ax         ; clear ax to 0
+mov  ds, ax         ; set data segment register to 0
+mov  es, ax         ; set extra segment register to 0
+cli                 ; disable interrupts
+mov  ss, ax         ; set stack segment register to 0
+mov  sp, 0x8000     ; set stack pointer register to 0x8000
+sti                 ; enable interrupts
 
-mov [BOOT_DRIVE], dl
 
 start:
     mov si, WELCOME_MESSAGE
@@ -35,7 +34,6 @@ start:
 DISK_MESSAGE: db 'Loading Disk\',0
 WELCOME_MESSAGE: db '\Booting Test OS\',0
 _16BIT_MESSAGE: db '16 bit real mode\',0
-BOOT_DRIVE: db 0
 KERNEL_OFFSET equ 0x1000
 PROGRAM_SPACE equ 0x7E00
 
