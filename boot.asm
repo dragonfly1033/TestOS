@@ -5,15 +5,15 @@ xor  ax, ax         ; clear ax to 0
 mov  ds, ax         ; set data segment register to 0
 mov  es, ax         ; set extra segment register to 0x0000
 
-mov [BOOT_DISK], dl
-mov ax, 0x06C0
+mov [BOOT_DISK], dl ; save dl into const for later
+mov ax, 0x06C0      
 cli                 ; disable interrupts
-mov  ss, ax         ; set stack segment register to 0
-mov  sp, 0x1000     ; set stack pointer register to 0x7e00
+mov  ss, ax         ; set stack segment register to 0x6c00 (0x06c0 << 4)
+mov  sp, 0x1000     ; set stack pointer register to 0x7c00 (0x6c00 + 0x1000)
 sti                 ; enable interrupts
 
 
-jmp 0x0000:start
+jmp 0x0000:start    ; far jump to start to set CS:IP
 
 
 
@@ -28,13 +28,13 @@ start:
     mov si, DISK_MESSAGE
     call print_string16
 
-    mov bx, KERNEL_OFFSET
-    mov dl, [BOOT_DISK]
-    mov dh, 1
+    mov bx, KERNEL_OFFSET   ; define where to read disk contents to
+    mov dl, [BOOT_DISK]     ; define boot disk number saved earlier
+    mov dh, 1               ; define how many sectors to read
     call load_disk  
 
-    mov si, [KERNEL_OFFSET]
-    call print_hex16
+    mov si, [KERNEL_OFFSET] ; read data at memory loaction of kernel
+    call print_hex16        
 
     jmp $
 

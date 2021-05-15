@@ -6,7 +6,7 @@ load_disk:
 
     push dx
 
-    mov [SECTORS], dh
+    mov [SECTORS], dh       ; save sectors to read in variable
 
     mov dl, [BOOT_DISK]    ; dl <- drive no. assigned by BIOS
     mov cl, 0x02            ; start read at this sector no.
@@ -19,15 +19,15 @@ load_disk:
     try:                    ; try disk read 5 times
         mov al, [SECTORS]      ; no. of sectors to read after start sector cl
         mov ah, 0x02    ; disk read mode
-        int 0x13
-        jc reset
+        int 0x13        ; disk interrupt
+        jc reset        ; fail reset and retry
 
-        sub [SECTORS], al
-        jz ready
-        mov cl, 0x01
-        xor dh, 1
-        jnz set_counter
-        inc ch
+        sub [SECTORS], al   ; check remaining sectors
+        jz ready            ; exit loop
+        mov cl, 0x01        ; start read at sector 1
+        xor dh, 1           ; toggle head no. between 1 and 0
+        jnz set_counter     
+        inc ch              ; next cylinder
         jmp set_counter
 
     reset:
