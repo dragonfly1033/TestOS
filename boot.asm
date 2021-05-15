@@ -3,14 +3,22 @@
 
 xor  ax, ax         ; clear ax to 0
 mov  ds, ax         ; set data segment register to 0
-mov  es, ax         ; set extra segment register to 0
+mov  es, ax         ; set extra segment register to 0x0000
+
+mov [BOOT_DISK], dl
+mov ax, 0x06C0
 cli                 ; disable interrupts
 mov  ss, ax         ; set stack segment register to 0
-mov  sp, 0x8000     ; set stack pointer register to 0x8000
+mov  sp, 0x1000     ; set stack pointer register to 0x7e00
 sti                 ; enable interrupts
 
 
+jmp 0x0000:start
+
+
+
 start:
+
     mov si, WELCOME_MESSAGE
     call print_string16
 
@@ -20,12 +28,15 @@ start:
     mov si, DISK_MESSAGE
     call print_string16
 
-    call load_disk
+    mov bx, KERNEL_OFFSET
+    mov dl, [BOOT_DISK]
+    mov dh, 1
+    call load_disk  
 
-    mov si, PROGRAM_SPACE
-    call print_string16
+    mov si, [KERNEL_OFFSET]
+    call print_hex16
 
-    jmp $   
+    jmp $
 
 %include "print.asm"
 %include "disk.asm"  
@@ -35,11 +46,9 @@ DISK_MESSAGE: db 'Loading Disk\',0
 WELCOME_MESSAGE: db '\Booting Test OS\',0
 _16BIT_MESSAGE: db '16 bit real mode\',0
 KERNEL_OFFSET equ 0x1000
-PROGRAM_SPACE equ 0x7E00
-
+BOOT_DISK: db 0
 
 times 510-($-$$) db 0
 dw 0xaa55
 
-dw 0x4241
-times 510 db 0
+times 256 dw 0xdada
